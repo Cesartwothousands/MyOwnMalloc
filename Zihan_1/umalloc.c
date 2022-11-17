@@ -4,7 +4,7 @@
 #include "umalloc.h"
 
 
-static char mem[10240];
+static char mem[SIZEOFMEM];
 
 
 void ufree(void* ptr, char* file, int line) {
@@ -12,13 +12,16 @@ void ufree(void* ptr, char* file, int line) {
 	if(ptr == NULL) {
 		return; 
 	}
+	
 	//run through the meta data, check if given pointer exist or is being used. 
 	void* ptrBlock = mem; 
 	int memSize = 0; 
+	
 	//create a way to access the previous metadata.
 	metadata *prev = NULL; 
 	for(metadata *crnt = ptrBlock; crnt != NULL; crnt = crnt->next ) {
 			void *ptrCrnt = &crnt->inUse; 	
+			
 			//the ptr that was called on is found, check if it can be freed or not
 			if((ptrCrnt+sizeof(metadata)) == ptr) {
 
@@ -31,7 +34,6 @@ void ufree(void* ptr, char* file, int line) {
 					crnt->inUse = 1; 
 
 					//Now check for other possible neighboring Free block to merge with.
-					
 					//the free is between two other freed metadata.  
 					if(prev != NULL && crnt->next != NULL) {
 						if(prev->inUse == 1 && crnt->next->inUse == 1) {
@@ -47,7 +49,6 @@ void ufree(void* ptr, char* file, int line) {
 								mem[i] = 0; 
 							}
 							return;
-
 						}
 					}
 
@@ -86,17 +87,17 @@ void ufree(void* ptr, char* file, int line) {
 							
 						}
 					}
-
 						
 					return;
-				}	
+				}
+
 				//The pointer is not being used. 
 				else{
 					printf("pointer already has been freed\nfile:%s\nline:%d\n", file, line);
-					return; 
+					return;
 				}
-
 			}
+
 			//move the previous foward
 			prev = crnt; 
 			//update memSize
@@ -109,10 +110,9 @@ void ufree(void* ptr, char* file, int line) {
 
 //return a void pointer 
 void* umalloc(size_t size, char* file, int line) {
-
 			
 	//if the size is greater than 10240 minus the size of meta, there is not enough space
-	if(size > (10240-sizeof(metadata))) {
+	if(size > (SIZEOFMEM-sizeof(metadata))) {
 		printf("there is no free memory\n file:%s\n line:%d\n", file,line);
 		return NULL;
 	}
@@ -128,20 +128,23 @@ void* umalloc(size_t size, char* file, int line) {
 	metadata *isEmpty = f; 
 	//the array is empty
 	if(isEmpty->size == 0) {
+
 		//create a new struct to hold the first block allocated and a second to watch over the remaining unused space. 
 		metadata* front = (metadata*) mem; 
 		front->inUse = 2; 
 		front->size = size; 
 		front->next = NULL;
 		void* ptr = mem+sizeof(metadata); 
+
 		//if the entire array is being used, then there is nothing left over. 
-		if(sizeof(metadata)+size == 10240) {
+		if(sizeof(metadata)+size == SIZEOFMEM) {
 			return ptr; 
 		}
+
 		//the metadata for the remaining memory which will not be in use
 		metadata* leftover = (metadata*) (mem+sizeof(metadata)+size); 
 		leftover->inUse = 1; 
-		leftover->size = (10240-sizeof(metadata)-size); 
+		leftover->size = (SIZEOFMEM-sizeof(metadata)-size); 
 		leftover->next = NULL;
 		front->next = leftover; 
 	    return ptr;	
@@ -180,9 +183,9 @@ void* umalloc(size_t size, char* file, int line) {
 				}
 				
 				//split into two block of meta data
-				
 				//create the new block at the appropriate location	
 				metadata *temp = (metadata*) (mem+memUsed-crnt->size+size);
+
 				//since it will be empty set it to free
 				temp->inUse = 1; 
 				temp->size = (crnt->size-sizeof(metadata)-size); 
@@ -201,9 +204,7 @@ void* umalloc(size_t size, char* file, int line) {
 		//The last meta data was reached, a new block must be allocated. 
 		if(crnt->next == NULL) {
 
-		
-
-			if(memUsed + size + sizeof(metadata) > 10240) {
+			if(memUsed + size + sizeof(metadata) > SIZEOFMEM) {
 				printf("Not enough memory avaliable for malloc call\nfile:%s\nline%d\n", file, line);
 				return NULL;
 			}
@@ -226,12 +227,7 @@ void* umalloc(size_t size, char* file, int line) {
 		}
 		
 	}
-	
-	
 
 	//this should not be reached.  
 	return NULL;  	
 }
-
-
-
