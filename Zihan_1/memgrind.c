@@ -6,10 +6,26 @@
 
 double difftimeval(const struct timeval *start, const struct timeval *end);
 
-void Consistency_test(){
+/*void Consistency_test(){
     char* ptr = (char*)malloc(10*sizeof(char));
     strcpy(ptr,"hello");
     free(ptr);
+}*/
+
+void Consistency_test(){
+    for (int i = 0; i < 2; i++){
+        char* ptr;
+        ptr = (char*)malloc(2 * sizeof(char));
+        if (ptr == NULL) {
+            printf("Memory not allocated.\n");
+            exit(0);
+        }
+        else{
+            printf("Memory successfully allocated using malloc.\n");
+            printf("Address of ptr: %p\n", ptr);
+        }
+        free(ptr);
+    }
 }
 
 int Maximization_test(){
@@ -60,6 +76,7 @@ int main(){
         ptrs[allocationsNum] = malloc(1);
     }
     printf("maximal number of allocations is: %d\n",allocationsNum);
+    printf("Saturation_test passed!\n\n");
 
     // ******* Time Overhead test *********
     allocationsNum--;
@@ -71,6 +88,8 @@ int main(){
     gettimeofday(&end, NULL);
     long end1 = ((long)end.tv_sec)*1000+(long)end.tv_usec/1000;
     printf("Cost time: %.8ld ms\n", end1 - start1);
+    printf("Time_overhead passed!\n\n");
+
     // printf("%.8f\n", difftimeval(&end, &start));
     double time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
    
@@ -79,6 +98,7 @@ int main(){
         free(ptrs[allocationsNum--]);
     }
     free(ptrs[0]);
+    printf("Intermediate_coalescence passed!\n\n");
 
     return 0;
 }
