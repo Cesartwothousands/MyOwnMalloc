@@ -38,11 +38,17 @@ void BasicCoalescence_test(int max_allocation){
 }
 
 int main(){
+    printf("\nStart the test of our project\n\n");
+
     Consistency_test();
+    printf("Consistency_test passed!\n\n");
+    
     int max_allocation = Maximization_test();
     printf("maximal allocation is: %d\n",max_allocation);
+    printf("Maximization_test passed!\n\n");
 
     BasicCoalescence_test(max_allocation);
+    printf("BasicCoalescence_test passed!\n\n");
    
 
     // ******* Saturation test *********
