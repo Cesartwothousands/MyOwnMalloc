@@ -68,7 +68,7 @@ int main(){
    
 
     // ******* Saturation test *********
-    char *ptrs[10500] = {0};
+    char *ptrs[SIZEOFMEM+1] = {0};
     int allocationsNum = 0;
     ptrs[allocationsNum] = malloc(1);
     while(ptrs[allocationsNum]!=NULL){
@@ -81,22 +81,27 @@ int main(){
     // ******* Time Overhead test *********
     allocationsNum--;
     free(ptrs[allocationsNum]);
+
     struct timeval start,end;
     gettimeofday(&start, NULL);
-    long start1 = ((long)start.tv_sec)*1000+(long)start.tv_usec/1000;
     ptrs[allocationsNum] = malloc(1);
     gettimeofday(&end, NULL);
-    long end1 = ((long)end.tv_sec)*1000+(long)end.tv_usec/1000;
-    printf("Cost time: %.8ld ms\n", end1 - start1);
+
+    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;  
+    printf("Cost time:=%fs\n",timeuse /1000000.0);  
+
+    //printf("Cost time: %.16ld ms\n", end1 - start1);
     printf("Time_overhead passed!\n\n");
 
     // printf("%.8f\n", difftimeval(&end, &start));
-    double time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
+    //double time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
    
     // ******* Intermediate Coalescence test *********
     while(allocationsNum){
         free(ptrs[allocationsNum--]);
     }
+    free(ptrs[0]);
+    ptrs[0] = malloc(max_allocation);
     free(ptrs[0]);
     printf("Intermediate_coalescence passed!\n\n");
 
