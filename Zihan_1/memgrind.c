@@ -53,6 +53,23 @@ void BasicCoalescence_test(int max_allocation){
     free(ptr3);
 }
 
+void ErrorDetection(){
+    //  Free()ing addresses that are not pointers:
+    int x;
+    free( (int*)x );
+
+    //  Free()ing pointers that were not allocated by malloc():
+    int * y;
+    free( y );
+
+    // Redundant free()ing of the same pointer:
+    int *p = (char*)malloc(100);
+    free(p);
+    free(p);
+
+
+}
+
 int main(){
     printf("\nStart the test of our project\n\n");
 
@@ -88,7 +105,7 @@ int main(){
     gettimeofday(&end, NULL);
 
     long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;  
-    printf("Cost time:=%fs\n",timeuse /1000000.0);  
+    printf("Cost time: %fs\n",timeuse /1000000.0);  
 
     //printf("Cost time: %.16ld ms\n", end1 - start1);
     printf("Time_overhead passed!\n\n");
@@ -104,6 +121,8 @@ int main(){
     ptrs[0] = malloc(max_allocation);
     free(ptrs[0]);
     printf("Intermediate_coalescence passed!\n\n");
+
+    ErrorDetection();
 
     return 0;
 }

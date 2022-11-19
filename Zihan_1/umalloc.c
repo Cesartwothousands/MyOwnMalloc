@@ -10,6 +10,7 @@ static char mem[SIZEOFMEM];
 void ufree(void* ptr, char* file, int line) {
 
 	if(ptr == NULL) {
+		printf("Error on free(): Free()ing addresses that are not pointers\n  file:%s\n  line:%d\n", file, line);
 		return; 
 	}
 	
@@ -93,8 +94,8 @@ void ufree(void* ptr, char* file, int line) {
 
 				//The pointer is not being used. 
 				else{
-					printf("pointer already has been freed\nfile:%s\nline:%d\n", file, line);
-					return;
+					printf("Error on free(): Redundant free()ing of the same pointer\n  file:%s\n  line:%d\n", file, line);
+					return; 
 				}
 			}
 
@@ -104,7 +105,7 @@ void ufree(void* ptr, char* file, int line) {
 		 	memSize = memSize + sizeof(metadata) + crnt->size;
 	}
 
-	printf("Invalid call to free, pointer was never malloced\n file:%s\n line:%d\n", file, line);
+	printf("Error on free(): Invalid call to free, pointer was never malloced\n  file:%s\n  line:%d\n", file, line);
 }
 
 
@@ -113,13 +114,13 @@ void* umalloc(size_t size, char* file, int line) {
 			
 	//if the size is greater than 10240 minus the size of meta, there is not enough space
 	if(size > (SIZEOFMEM-sizeof(metadata))) {
-		printf("there is no free memory\n file:%s\n line:%d\n", file,line);
+		printf("there is no free memory\n  file:%s\n  line:%d\n", file,line);
 		return NULL;
 	}
 
 	//if they malloc a size = 0, it is not an error, just returns a null pointer
 	if(size == 0) {
-		printf("the amount requested makes no sense\n file:%s\n line:%d\n", file,line);
+		printf("the amount requested makes no sense\n  file:%s\n  line:%d\n", file,line);
 		return NULL; 
 	}
 
@@ -205,7 +206,7 @@ void* umalloc(size_t size, char* file, int line) {
 		if(crnt->next == NULL) {
 
 			if(memUsed + size + sizeof(metadata) > SIZEOFMEM) {
-				printf("Not enough memory avaliable for malloc call\nfile:%s\nline%d\n", file, line);
+				printf("Not enough memory avaliable for malloc call\n  file:%s\n  line%d\n", file, line);
 				return NULL;
 			}
 
