@@ -46,6 +46,23 @@ void BasicCoalescence_test(int max_allocation){
     free(ptr3);
 }
 
+void ErrorDetection(){
+    //  Free()ing addresses that are not pointers:
+    int x;
+    free((int*)x);
+
+    //  Free()ing pointers that were not allocated by malloc():
+    int * y;
+    free(y);
+
+    // Redundant free()ing of the same pointer:
+    char* p = (char*)malloc(100);
+    free(p);
+    free(p);
+
+}
+
+
 int main(){
     Consistency_test();
     int max_allocation = Maximization_test();
@@ -55,7 +72,7 @@ int main(){
    
 
     // ******* Saturation test *********
-    char *ptrs[10500] = {0};
+    char *ptrs[MEMSIZE + 1000] = {0};
     int allocationsNum = 0;
     ptrs[allocationsNum] = malloc(1);
     while(ptrs[allocationsNum]!=NULL){
@@ -64,7 +81,6 @@ int main(){
     }
     printf("maximal number of allocations is: %d\n",allocationsNum);
 
-    // ******* Time Overhead test *********
 
     // ******* Time Overhead test *********
     allocationsNum--;
@@ -89,5 +105,9 @@ int main(){
     ptrs[0] = malloc(max_allocation);
     free(ptrs[0]);
     printf("Intermediate_coalescence passed!\n\n");
+
+    //*****Error Detection*****//
+    ErrorDetection();
     return 0;
+
 }

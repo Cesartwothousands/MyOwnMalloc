@@ -2,14 +2,15 @@
 #include <stdio.h>
 #define malloc(x) umalloc(x,__FILE__, __LINE__)
 #define free(x) ufree(x,__FILE__, __LINE__)
+#define MEMSIZE 1024000
 
 #pragma pack(1)
 
 struct block{
-    size_t size;                  //区块大小
-    int free;                     //是否已使用
-    struct block *next;          //指向下一个区块
-    struct block *prev;
+    size_t size;    //  size of the block
+    int free;       //  free:1 occupied:0
+    struct block *next;  // pointer to next block
+    struct block *prev;  // pointer to previous block
 };
 
 void *umalloc(size_t size, char *file, int line);
