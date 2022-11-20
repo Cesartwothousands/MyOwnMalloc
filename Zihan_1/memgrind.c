@@ -85,7 +85,10 @@ int main(){
    
 
     // ******* Saturation test *********
-    char *ptrs[SIZEOFMEM+1] = {0};
+    char *ptrs[10500] = {0};
+    WHY?
+    Maybe the problem?
+
     int allocationsNum = 0;
     ptrs[allocationsNum] = malloc(1);
     while(ptrs[allocationsNum]!=NULL){

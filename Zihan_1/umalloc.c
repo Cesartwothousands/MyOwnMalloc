@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include "umalloc.h"
 
-
+#define SIZEOFMEM 10240
+//#define SIZEOFMEM 10485760
 static char mem[SIZEOFMEM];
 
 
