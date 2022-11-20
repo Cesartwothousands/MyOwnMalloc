@@ -3,9 +3,12 @@
 #include <sys/time.h>
 #include "umalloc.h"
 #include <string.h>
+#include <stdint.h>
+#include <time.h>
 
 
 void Consistency_test(){
+    printf("0.Starting consistency test\n");
     for (int i = 0; i < 2; i++){
         char* ptr;
         ptr = (char*)malloc(2 * sizeof(char));
@@ -19,32 +22,89 @@ void Consistency_test(){
         }
         free(ptr);
     }
+    printf("Consistency test succeed!\n");
+    puts( "" );
 }
 
-int Maximization_test(){
-    int max_allocation = 1;
-    char* ptr=NULL;
+unsigned long long Maximization_test(){
+    printf("1.Starting maximization test\n");
+    unsigned long long int max_allocation = 1;
+    char* ptr = NULL;
     ptr = malloc(max_allocation);
-    while(ptr!=NULL){
+    while(ptr != NULL){
         free(ptr);
-        max_allocation*=2;
+        max_allocation *= 2;
         //printf("maximal  is: %d\n",max_allocation);
         ptr = malloc(max_allocation);
     }
-    max_allocation/=2;
+    max_allocation /= 2;
     ptr = malloc(max_allocation);
     free(ptr);
     return max_allocation;
 }
 
-void BasicCoalescence_test(int max_allocation){
+void BasicCoalescence_test(unsigned long long max_allocation){
+    printf("2.Starting BasicCoalescence test\n");
     char* ptr1 = malloc(max_allocation/2);
     char* ptr2 = malloc(max_allocation/4);
     free(ptr1);
     free(ptr2);
     char* ptr3 = malloc(max_allocation);
     free(ptr3);
+    printf("successful in BasicCoalescence_test\n");
+    puts( "" );
 }
+
+
+void test345( size_t max )
+{
+    printf( "3. Starting Saturation test:\n" );
+    uintptr_t arr[9216] = { 0 };
+    for ( size_t i = 0; i < 9216; i++ )
+    {
+        arr[i] = (uintptr_t) malloc( 1024 );
+    }
+    size_t counter = 0;
+    uintptr_t arr_1b[2048] = { 0 };
+    for ( size_t i = 0; i < 2048; i++ )
+    {
+        if ( ! (arr_1b[i] = (uintptr_t) malloc( 1 ) ) )
+        {
+            break;
+        }
+        counter++;
+    }
+    size_t saturation = 9216 * 1024 + counter;
+    printf( "saturation: %ld bytes\n", saturation );
+    puts( "" );
+
+
+    // test 4
+    printf( "4. Time Overhead:\n" );
+    free( (void*) arr_1b[counter - 1] );
+    struct timespec start, end;
+    clock_gettime( CLOCK_REALTIME, &start );
+    malloc( 1 );
+    clock_gettime( CLOCK_REALTIME, &end );
+    printf( "running time: %lu micro second\n", ( end.tv_sec - start.tv_sec ) * 1000 + ( end.tv_nsec - start.tv_nsec ) / 1000000 );
+    puts( "" );
+
+
+    // test 5
+    puts( "5. Intermediate Coalescence:" );
+    for ( int i = counter - 1; i >= 0; i-- )
+    {
+        free( (void*) arr_1b[i] );
+    }
+    for ( int i = 9215; i >= 0; i-- )
+    {
+        free( (void*) arr[i] );
+    }
+    char* arr_q5 = malloc( max );
+    free( arr_q5 );
+    puts( "Intermediate Coalescence succeeded\n" );
+}
+
 
 void ErrorDetection(){
     //  Free()ing addresses that are not pointers:
@@ -64,49 +124,17 @@ void ErrorDetection(){
 
 
 int main(){
+    printf("program starting\n");
     Consistency_test();
-    int max_allocation = Maximization_test();
-    printf("maximal allocation is: %d\n",max_allocation);
+
+    unsigned long long int max_allocation = Maximization_test();
+    printf("maximal allocation is: %llu\n",max_allocation);
+    puts( "" );
 
     BasicCoalescence_test(max_allocation);
-   
+    test345(max_allocation);
 
-    // ******* Saturation test *********
-    char *ptrs[MEMSIZE + 1000] = {0};
-    int allocationsNum = 0;
-    ptrs[allocationsNum] = malloc(1);
-    while(ptrs[allocationsNum]!=NULL){
-        allocationsNum++;
-        ptrs[allocationsNum] = malloc(1);
-    }
-    printf("maximal number of allocations is: %d\n",allocationsNum);
-
-
-    // ******* Time Overhead test *********
-    allocationsNum--;
-    free(ptrs[allocationsNum]);
-
-    struct timeval start,end;
-    gettimeofday(&start, NULL);
-    ptrs[allocationsNum] = malloc(1);
-    gettimeofday(&end, NULL);
-
-    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
-    printf("Cost time:=%fs\n",timeuse /1000000.0);
-
-    //printf("Cost time: %.16ld ms\n", end1 - start1);
-    printf("Time_overhead passed!\n\n");
-   
-    // ******* Intermediate Coalescence test *********
-    while(allocationsNum){
-        free(ptrs[allocationsNum--]);
-    }
-    free(ptrs[0]);
-    ptrs[0] = malloc(max_allocation);
-    free(ptrs[0]);
-    printf("Intermediate_coalescence passed!\n\n");
-
-    //*****Error Detection*****//
+    puts("Exception handling:");
     ErrorDetection();
     return 0;
 
