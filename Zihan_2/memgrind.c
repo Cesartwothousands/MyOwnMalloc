@@ -64,11 +64,12 @@ void ErrorDetection(){
     free(p);
     free(p);
 
-    printf("Normal test:\n\n");
+    printf("\nNormal_test:\n");
     p = (char *)malloc( 100 );
     free( p );
     p = (char *)malloc( 100 );
     free( p );    
+    printf("Normal_test passed!");
 
 }
 
