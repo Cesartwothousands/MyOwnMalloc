@@ -82,11 +82,12 @@ void test345( size_t max )
     // test 4
     printf( "4. Time Overhead:\n" );
     free( (void*) arr_1b[counter - 1] );
-    struct timespec start, end;
-    clock_gettime( CLOCK_REALTIME, &start );
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
     malloc( 1 );
-    clock_gettime( CLOCK_REALTIME, &end );
-    printf( "running time: %lu micro second\n", ( end.tv_sec - start.tv_sec ) * 1000 + ( end.tv_nsec - start.tv_nsec ) / 1000000 );
+    gettimeofday(&end, NULL);
+    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
+    printf("Cost time: %fms\n",timeuse /1000.0);
     puts( "" );
 
 
