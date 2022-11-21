@@ -105,7 +105,7 @@ int main(){
         }
     }
 
-    printf("maximal number of allocations is: %d\n",allocationsNum - 9215);
+    printf("maximal number of allocations is: %d\n",allocationsNum + 9216 * 1024);
     printf("Saturation_test passed!\n\n");
 
 
