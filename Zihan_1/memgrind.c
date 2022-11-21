@@ -86,8 +86,6 @@ int main(){
 
     // ******* Saturation test *********
     char *ptrs[10500] = {0};
-    WHY?
-    Maybe the problem?
 
     int allocationsNum = 0;
     ptrs[allocationsNum] = malloc(1);

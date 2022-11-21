@@ -4,13 +4,6 @@
 #include "umalloc.h"
 #include <string.h>
 
-double difftimeval(const struct timeval *start, const struct timeval *end);
-
-/*void Consistency_test(){
-    char* ptr = (char*)malloc(10*sizeof(char));
-    strcpy(ptr,"hello");
-    free(ptr);
-}*/
 
 void Consistency_test(){
     for (int i = 0; i < 2; i++){
@@ -21,7 +14,7 @@ void Consistency_test(){
             exit(0);
         }
         else{
-            printf("Memory successfully allocated using malloc.\n");
+            printf("Small block %d successfully allocated using malloc.\n", i + 1);
             printf("Address of ptr: %p\n", ptr);
         }
         free(ptr);
@@ -34,8 +27,8 @@ int Maximization_test(){
     ptr = malloc(max_allocation);
     while(ptr!=NULL){
         free(ptr);
+        printf("Allocate %d B\n",max_allocation);
         max_allocation*=2;
-        printf("maximal  is: %d\n",max_allocation);
         ptr = malloc(max_allocation);
     }
     max_allocation/=2;
@@ -47,13 +40,17 @@ int Maximization_test(){
 void BasicCoalescence_test(int max_allocation){
     char* ptr1 = malloc(max_allocation/2);
     free(ptr1);
+    printf("Allocate max_allocation/2: %d B and free it\n",max_allocation/2);
     char* ptr2 = malloc(max_allocation/4);
     free(ptr2);
+    printf("Allocate max_allocation/4: %d B and free it\n",max_allocation/4);
     char* ptr3 = malloc(max_allocation);
     free(ptr3);
+    printf("Allocate max_allocation: %d B and free it\n",max_allocation);
 }
 
 void ErrorDetection(){
+    printf("\nStart the ErrorDetection test:\n\n");
     //  Free()ing addresses that are not pointers:
     int x;
     free( (int*)x );
@@ -67,17 +64,24 @@ void ErrorDetection(){
     free(p);
     free(p);
 
+    printf("Normal test:\n\n");
+    p = (char *)malloc( 100 );
+    free( p );
+    p = (char *)malloc( 100 );
+    free( p );    
 
 }
 
 int main(){
     printf("\nStart the test of our project\n\n");
 
+    printf("\n0. Consistency_test:\n\n");
     Consistency_test();
     printf("Consistency_test passed!\n\n");
-    
+
+    printf("\n1. Maximization_test:\n\n");    
     int max_allocation = Maximization_test();
-    printf("maximal allocation is: %d\n",max_allocation);
+    printf("Maximal allocation is: %d B\n",max_allocation);
     printf("Maximization_test passed!\n\n");
 
     BasicCoalescence_test(max_allocation);
@@ -85,15 +89,24 @@ int main(){
    
 
     // ******* Saturation test *********
-    char *ptrs[10500] = {0};
+    char *ptrs[102400] = {0};
     int allocationsNum = 0;
-    ptrs[allocationsNum] = malloc(9216);
+
+    ptrs[allocationsNum] = malloc(1024);
     while(ptrs[allocationsNum]!=NULL){
+        //printf("%d %d \n",ptrs[allocationsNum], allocationsNum);
         allocationsNum++;
-        ptrs[allocationsNum] = malloc(9216);
+        if(allocationsNum<9216){
+            ptrs[allocationsNum] = malloc(1024);
+        }
+        else{
+            ptrs[allocationsNum] = malloc(1);
+        }
     }
-    printf("maximal number of allocations is: %d\n",allocationsNum);
+
+    printf("maximal number of allocations is: %d\n",allocationsNum - 9215);
     printf("Saturation_test passed!\n\n");
+
 
     // ******* Time Overhead test *********
     allocationsNum--;
@@ -107,39 +120,26 @@ int main(){
     long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;  
     printf("Cost time: %fs\n",timeuse /1000000.0);  
 
-    //printf("Cost time: %.16ld ms\n", end1 - start1);
     printf("Time_overhead passed!\n\n");
 
-    // printf("%.8f\n", difftimeval(&end, &start));
-    //double time_use=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
+
     // ******* Intermediate Coalescence test *********
     while(allocationsNum){
+        //printf("%d %d \n",ptrs[allocationsNum], allocationsNum);
         free(ptrs[allocationsNum--]);
     }
+    //printf("1 %d %d \n",ptrs[allocationsNum], allocationsNum);
     free(ptrs[0]);
+    //printf("2 %d %d \n",ptrs[allocationsNum], allocationsNum);
+    printf("Free all one by one\n");
     ptrs[0] = malloc(max_allocation);
+    //printf("3 %d %d \n",ptrs[allocationsNum], allocationsNum);
     free(ptrs[0]);
+    //printf("4 %d %d \n",ptrs[allocationsNum], allocationsNum);
+    printf("Allocate max_allocation: %d B and free it\n",max_allocation);
     printf("Intermediate_coalescence passed!\n\n");
 
     ErrorDetection();
 
     return 0;
-}
-
-double difftimeval(const struct timeval *start, const struct timeval *end)
-{
-        double d;
-        time_t s;
-        suseconds_t u;
-
-        s = start->tv_sec - end->tv_sec;
-        u = start->tv_usec - end->tv_usec;
-        //if (u < 0)
-        //        --s;
-
-        d = s;
-        d *= 1000000.0;
-        d += u;
-
-        return d;
 }
