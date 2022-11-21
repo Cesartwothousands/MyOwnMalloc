@@ -109,7 +109,9 @@ void ufree(void* ptr, char* file, int line) {
 		 	memSize = memSize + sizeof(metadata) + crnt->size;
 	}
 
-	printf("Error on free(): Invalid call to free, pointer was never malloced\n  file:%s\n  line:%d\n", file, line);
+	if (((void *) mem > ptr) || (ptr > (void *) (mem + SIZEOFMEM))){
+		printf("Error on free(): Invalid call to free, pointer was never malloced\n  file:%s\n  line:%d\n", file, line);
+	}	
 }
 
 
