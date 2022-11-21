@@ -2,7 +2,7 @@
 #include <stdio.h>
 #define malloc(x) umalloc(x,__FILE__, __LINE__)
 #define free(x) ufree(x,__FILE__, __LINE__)
-#define MEMSIZE 1024000
+#define MEMSIZE 10485760
 
 #pragma pack(1)
 
