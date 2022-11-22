@@ -1,3 +1,7 @@
+// File:	umalloc.c
+
+// List all group members' names:	Zihan Chen(zc366), Jiayi Zhang(jz998)
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -118,7 +122,7 @@ void ufree(void* ptr, char* file, int line) {
 //return a void pointer 
 void* umalloc(size_t size, char* file, int line) {
 			
-	//if the size is greater than 10240 minus the size of meta, there is not enough space
+	//if the size is greater than SIZE minus the size of meta, there is not enough space
 	if(size > (SIZEOFMEM-sizeof(metadata))) {
 		printf("there is no free memory\n  file:%s\n  line:%d\n", file,line);
 		return NULL;
@@ -166,7 +170,6 @@ void* umalloc(size_t size, char* file, int line) {
 
 		//keep track of the total mem used that way the next meta location is known if one needs to be made.  
 		memUsed= memUsed + crnt->size + sizeof(metadata);
-		//printf("block size: %d inUse: %d      block+meta %ld\n", crnt->size, crnt->inUse, crnt->size+sizeof(meta));	
 		
 		if(crnt->inUse == 1) {
 			
@@ -236,5 +239,5 @@ void* umalloc(size_t size, char* file, int line) {
 	}
 
 	//this should not be reached.  
-	return NULL;  	
+	return NULL;
 }

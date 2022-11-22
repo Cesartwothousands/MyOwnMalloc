@@ -1,3 +1,7 @@
+// File:	umalloc.h
+
+// List all group members' names:	Zihan Chen(zc366), Jiayi Zhang(jz998)
+
 #include <stdlib.h>
 
 

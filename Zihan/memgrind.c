@@ -1,3 +1,7 @@
+// File:	memgrind.c
+
+// List all group members' names:	Zihan Chen(zc366), Jiayi Zhang(jz998)
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -69,7 +73,7 @@ void ErrorDetection(){
     free( p );
     p = (char *)malloc( 100 );
     free( p );    
-    printf("Normal_test passed!");
+    printf("Normal_test passed!\n");
 
 }
 
