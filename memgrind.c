@@ -1,7 +1,5 @@
 // File:	memgrind.c
 
-// List all group members' names:	Zihan Chen(zc366), Jiayi Zhang(jz998)
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>

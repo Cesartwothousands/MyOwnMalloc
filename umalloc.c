@@ -1,10 +1,11 @@
+// File:	umalloc.c
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "umalloc.h"
 
-#define SIZEOFMEM 10240
-//#define SIZEOFMEM 10485760
+#define SIZEOFMEM 10485760
 static char mem[SIZEOFMEM];
 
 
@@ -31,7 +32,8 @@ void ufree(void* ptr, char* file, int line) {
 				if(crnt->inUse == 2) {
 					//sets the values of the return pointers to 0. 
 					for(int i = (memSize+sizeof(metadata)); i < (memSize+crnt->size+sizeof(metadata)); i++) {
-							mem[i] = 0; 
+							  if(0<=i && i<SIZEOFMEM)
+								        mem[i] = 0; 
 						}
 					crnt->inUse = 1; 
 
@@ -48,7 +50,8 @@ void ufree(void* ptr, char* file, int line) {
 							prev->next = crnt->next->next;
 						       	crnt = prev; 	
 							for(int i = (memSize - oldSize2); i < (memSize - oldSize2 + sizeof(metadata)+oldSize2+sizeof(metadata)+oldSize+oldSize3); i++) {
-								mem[i] = 0; 
+								  if(0<=i && i<SIZEOFMEM)
+								        mem[i] = 0; 
 							}
 							return;
 						}
@@ -67,7 +70,8 @@ void ufree(void* ptr, char* file, int line) {
 							crnt = prev; 
 
 							for(int i = (memSize); i < (memSize+sizeof(metadata)+oldSize); i++) {
-								mem[i] = 0; 
+								  if(0<=i && i<SIZEOFMEM)
+								        mem[i] = 0; 
 							}
 
 							return; 
@@ -82,7 +86,8 @@ void ufree(void* ptr, char* file, int line) {
 							crnt->next = crnt->next->next; 
 
 								for(int i = (memSize+sizeof(metadata)); i < (memSize+sizeof(metadata)+sizeof(metadata)+(crnt->size-oldSize)); i++) {
-									mem[i] = 0;
+									  if(0<=i && i<SIZEOFMEM)
+								        mem[i] = 0; 
 								}	
 
 							return; 
@@ -106,14 +111,16 @@ void ufree(void* ptr, char* file, int line) {
 		 	memSize = memSize + sizeof(metadata) + crnt->size;
 	}
 
-	printf("Error on free(): Invalid call to free, pointer was never malloced\n  file:%s\n  line:%d\n", file, line);
+	if (((void *) mem > ptr) || (ptr > (void *) (mem + SIZEOFMEM))){
+		printf("Error on free(): Invalid call to free, pointer was never malloced\n  file:%s\n  line:%d\n", file, line);
+	}	
 }
 
 
 //return a void pointer 
 void* umalloc(size_t size, char* file, int line) {
 			
-	//if the size is greater than 10240 minus the size of meta, there is not enough space
+	//if the size is greater than SIZE minus the size of meta, there is not enough space
 	if(size > (SIZEOFMEM-sizeof(metadata))) {
 		printf("there is no free memory\n  file:%s\n  line:%d\n", file,line);
 		return NULL;
@@ -161,7 +168,6 @@ void* umalloc(size_t size, char* file, int line) {
 
 		//keep track of the total mem used that way the next meta location is known if one needs to be made.  
 		memUsed= memUsed + crnt->size + sizeof(metadata);
-		//printf("block size: %d inUse: %d      block+meta %ld\n", crnt->size, crnt->inUse, crnt->size+sizeof(meta));	
 		
 		if(crnt->inUse == 1) {
 			
@@ -231,5 +237,5 @@ void* umalloc(size_t size, char* file, int line) {
 	}
 
 	//this should not be reached.  
-	return NULL;  	
+	return NULL;
 }
