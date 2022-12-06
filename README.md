@@ -22,19 +22,19 @@ We use **inUse** to store the status whether it can be freed, we use **size** to
 
 Allocate and free twice, the address of the pointers are the same
 
-[pic1](pic1.png)
+![pic1](pic1.png)
 
 ### Maximization
 
 Find max_allocation: 8388608 B
 
-[pic2](pic2.png)
+![pic2](pic2.png)
 
 ### Basic Coalescence
 
 Pass all the test, it could work
 
-[pic3](pic3.png)
+![pic3](pic3.png)
 
 ### Saturation, Time Overhead and Intermediate Coalescence
 
@@ -46,7 +46,7 @@ Use **gettimeofday** to calculate Cost Time 0.000481s
 
 Free one by one and allocate max allocation, pass all the test, it could work
 
-[pic4](pic4.png)
+![pic4](pic4.png)
 
 ## 3. Error Detection
 
@@ -54,4 +54,4 @@ Use three error tests and one successful test given by Introduction
 
 Pass all the test, it could work
 
-[pic5](pic5.png)
+![pic5](pic5.png)
